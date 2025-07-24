@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Modern Vue Portfolio</title>
+  
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+  
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary-color: #3a86ff;
+      --secondary-color: #8338ec;
+      --dark-color: #1a1a2e;
+      --light-color: #f8f9fa;
+      --accent-color: #ff006e;
+      --text-dark: #333;
+      --text-light: #f8f9fa;
+      /* set two */
+      --primary: #c0900c;
+      --secondary: #af4829;
+      --accent: #af4829;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    body { background-color: var(--light-color); color: var(--text-dark); line-height: 1.6; overflow-x: hidden; }
+    #app {
+      display: grid;
+      grid-template-columns: 250px 1fr 250px;
+      height: 100vh;
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    #fabContainer {
+        z-index: 1000;
+    }
+    #fabContainer .fab-child {
+        margin-top: 0.5rem;
+    }
+    .header_color{
+        color: #edbb2f;
+    }
+    .left-section { background-color: var(--dark-color); color: var(--text-light); padding: 2rem; display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1); }
+    .profile { text-align: center; margin-bottom: 2rem; }
+    .profile-img { margin-left: 15px; width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 5px solid var(--primary-color); margin-bottom: 1rem; transition: all 0.3s ease; }
+    .profile-img:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(58, 134, 255, 0.5); }
+    .sidebar-nav { margin-top: 2rem; width: 100%; margin-left: -20px; }
+    .sidebar-nav ul { list-style: none; }
+    .sidebar-nav li { margin-bottom: 1rem; }
+    .sidebar-nav a { color: var(--text-light); text-decoration: none; transition: all 0.3s ease; display: block; border-radius: 4px; position: relative; }
+    .sidebar-nav a.active { color: var(--primary-color); background-color: rgba(255,255,255,0.1); }
+    .sidebar-nav a.active::after { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--primary-color); }
+    .sidebar-nav a:hover { background-color: rgba(255,255,255,0.1); color: var(--primary-color); transform: translateX(5px); }
+    .nav-icon { margin-right: 10px; font-size: 1.2rem; }
+    .middle-section { padding: 2rem; background-color: white; overflow-y: auto; position: relative; height: 100vh; }
+    .section-title { color: var(--primary-color); margin-bottom: 1rem; position: relative; padding-bottom: 0.5rem; }
+    .section-title::after { content: ''; position: absolute; bottom: 0; left: 0; width: 50px; height: 3px; background: linear-gradient(to right, var(--primary-color), var(--secondary-color)); }
+    .about-text { margin-bottom: 2rem; }
+    .skills-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+    .skill-item { background-color: var(--light-color); padding: 0.8rem; border-radius: 5px; display: flex; align-items: center; }
+    .skill-icon { margin-right: 10px; color: var(--primary-color); }
+    .projects-container { margin-top: 2rem; }
+    .project-card { background-color: var(--light-color); border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+    .project-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); }
+    .project-title { color: var(--dark-color); margin-bottom: 0.5rem; }
+    .project-links a { margin-right: 10px; color: var(--primary-color); text-decoration: none; transition: color 0.3s ease; }
+    .project-links a:hover { color: var(--secondary-color); }
+    .right-section { padding: 2rem; background-color: var(--light-color); border-left: 1px solid #e1e1e1; }
+    .education-item, .experience-item { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #e1e1e1; }
+    .education-item:last-child, .experience-item:last-child { border-bottom: none; }
+    .education-title, .experience-title { font-weight: bold; margin-bottom: 0.3rem; }
+    .education-year, .experience-year { color: #666; font-size: 0.9rem; margin-bottom: 0.5rem; }
+    .social-links { display: flex; justify-content: space-around; margin-top: 2rem; }
+    .social-link { color: var(--dark-color); transition: color 0.3s ease; }
+    .social-link:hover { color: var(--primary-color); }
+    @media (max-width: 992px) { #app { grid-template-columns: 200px 1fr 200px; } }
+    @media (max-width: 768px) {
+      #app { grid-template-columns: 1fr; height: auto; overflow: visible; }
+      .left-section, .middle-section, .right-section { padding: 1.5rem; height: auto; position: static; }
+      .left-section { border-bottom: 1px solid #e1e1e1; }
+      .right-section { border-top: 1px solid #e1e1e1; }
+    }
+    @media (max-width: 576px) { .skills-list { grid-template-columns: 1fr; } }
+  </style>
+</head>
+
+<body>
+<div id="app">
+  <!-- Left Section -->
+  <div class="left-section">
+    <div class="profile">
+      <img src="https://res.cloudinary.com/dyuan83wz/image/upload/v1751684497/Lee-profile-2025_caul9m.png" alt="Profile" class="profile-img">
+      <h2>LEE ROBIN ROXAS</h2>
+      <p>Full-Stack Web Developer</p>
+    </div>
+    <nav class="sidebar-nav d-none d-md-block">
+      <ul>
+        <li v-for="navItem in navItems" :key="navItem.label">
+          <a :href="'#' + navItem.target" @click.prevent="smoothScroll(navItem.target)">
+            <span class="nav-icon">{{ navItem.icon }}</span>{{ navItem.label }}
+          </a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+
+  <!-- Middle Section -->
+  <div class="middle-section">
+    <!-- About -->
+    <section id="about" class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto bg-black rounded-xl shadow-sm mt-2">
+      <div class="text-center mb-12">
+        <!-- <span class="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-500 text-sm font-medium mb-2">ABOUT ME</span> -->
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-white">Profile Summary</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="animate-fade-in delay-1">
+          <img src="https://res.cloudinary.com/dyuan83wz/image/upload/Image_20250705_122820_x77qme.png" alt="Lee Robin Roxas Profile" class="rounded-xl shadow-md w-full" style="max-height: 100%; margin-bottom: -100px;"/>
+          <!-- <br>
+          <span style="color: white;">Code</span> -->
+        </div>
+        <div class="animate-fade-in delay-2">
+          <h3 class="text-2xl font-bold mb-4 header_color">A Bit About Me</h3>
+          <p class="text-gray-200 text-justify mb-6">
+            I am a full-stack web developer with 2 years experience in the industry. I am passionate and well-trained about designing, coding, testing, analyzing, making solutions, reports and modifying websites or systems to meet client specifications.
+          </p>
+          <p class="text-gray-200 text-justify mb-6">
+            I graduated at First Asia Institute of Technology and Humanities (FAITH Colleges) with Bachelor of Science in Information Technology located at Tanauan City, Batangas, Philippines. I love to play guitar, online games like mmorpg, strategic and collaborative games.
+          </p>
+          <p class="text-gray-200 text-justify mb-6">
+            I seek to mold my expertise in terms of problem-solving skills, and proficiency in core materials used in creating systematical products. Also, to expand my knowledge and use it to contribute to the success and growth of your company as part of a dynamic and forward-thinking work environment.
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-blue-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Professional Experience</h4>
+                <p class="text-sm text-white">2+ Years.</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-green-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M23.134 8.64l-5.973-3.62a.286.286 0 0 0-.412.125l-1.4 3.286 2.842 1.696a.53.53 0 0 1 0 .921l-5.335 3.14-2.267 5.274a.127.127 0 0 0 .052.203.122.122 0 0 0 .134-.035l3.914-2.365 1.545 2.219a.373.373 0 0 0 .309.167h3.708a.367.367 0 0 0 .327-.2.382.382 0 0 0-.018-.386l-2.513-3.852 5.088-3.077c.577-.349.865-.74.865-1.172V9.813c0-.433-.288-.823-.866-1.172zM13.082 4.35L.845 12.052c-.577.348-.858.739-.845 1.171v1.173c.014.432.303.816.866 1.15l6.056 3.496a.286.286 0 0 0 .412-.146l1.36-3.286-2.884-1.633a.518.518 0 0 1-.275-.384.529.529 0 0 1 .254-.537l5.295-3.245 2.183-5.316a.128.128 0 0 0-.04-.142.122.122 0 0 0-.146-.005z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Front-end</h4>
+                <p class="text-sm text-white">UI/UX design, templating and wireframing.</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-purple-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M.95 14.184L12 20.403l9.919-5.55v2.21L12 22.662l-10.484-5.96-.565.308v.77L12 24l11.05-6.218v-4.317l-.515-.309L12 19.118l-9.867-5.653v-2.21L12 16.805l11.05-6.218V6.32l-.515-.308L12 11.974 2.647 6.681 12 1.388l7.76 4.368.668-.411v-.566L12 0 .95 6.27v.72L12 13.207l9.919-5.55v2.26L12 15.52 1.516 9.56l-.565.308Z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Back-end</h4>
+                <p class="text-sm text-white">Server-side data manipulation. Data requests and responses.</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-yellow-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1.875 0C.839 0 0 .84 0 1.875v4.792h24V1.875C24 .839 23.16 0 22.125 0zM0 8.889v6.222h24V8.89zm0 8.444v4.792C0 23.161.84 24 1.875 24h9v-6.667zm13.125 0V24h9C23.161 24 24 23.16 24 22.125v-4.792z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Project Management</h4>
+                <p class="text-sm text-white">Data management, architechture and maintenance through cloud services.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- <a href="#contact" class="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition duration-300 shadow-md">Contact Me</a> -->
+        </div>
+      </div>
+    </section>
+
+    <!-- works -->
+    <section id="works" class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto bg-black rounded-xl mt-12">
+      <div class="text-center mb-12">
+        <!-- <span class="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-500 text-sm font-medium mb-2">PORTFOLIO</span> -->
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-white">Work Experiences</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div v-for="(work, index) in works" :key="work.id" class="bg-white rounded-xl overflow-hidden shadow-md card-hover animate-fade-in" :class="'delay-' + (index % 3 + 1)">
+          <div class="h-48 overflow-hidden">
+            <img :src="work.image" :alt="work.alt" class="object-cover" style="max-width: 100%; max-height: 100%;"/>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl text-black font-bold mb-2">{{ work.title }}</h3>
+            <p class="text-gray-600 mb-2">{{ work.location }}</p>
+            <p class="text-black mb-4" style="font-size: 12px; font-style: italic;">{{ work.date }}</p>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="px-2 py-1 bg-yellow-300 text-black text-xs rounded-full" style="font-size: 16px; font-weight: bold;">{{ work.job }}</span>
+            </div>
+            <p class="text-black mb-4" style="text-align: justify;">{{ work.description }}</p>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span v-for="tag in work.tags" :key="tag" class="px-2 py-1 bg-gray-200 text-black text-xs rounded-full">{{ tag }}</span>
+            </div>
+            <div class="flex justify-between">
+              <a :href="work.companyLocation" target="_blank" class="text-blue-500 hover:text-blue-700 font-medium">View Location</a>
+              <a :href="work.companyUrl" target="_blank" class="text-gray-500 hover:text-gray-700 font-medium">Check Company</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-10 animate-fade-in delay-3">
+        <!-- <a href="#" class="inline-block px-6 py-3 border border-blue-500 text-blue-500 hover:bg-blue-50 font-medium rounded-lg transition duration-300">View All Works</a> -->
+      </div>
+    </section>
+
+    <!-- Skills Section -->
+    <section id="skills" class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+      <div class="text-center mb-12">
+        <!-- <span class="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-500 text-sm font-medium mb-2">SKILLS</span> -->
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4">My Expertise</h2>
+        <!-- <div class="h-1 w-20 bg-gradient-to-r from-blue-500 to-green-500 mx-auto"></div> -->
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-black p-8 rounded-xl shadow-sm animate-fade-in">
+          <h3 class="text-xl font-bold mb-6 text-center header_color">Tech Stacks</h3>
+          <div class="space-y-6">
+            <div class="row">
+              <div class="col-md-12">
+                <h2 class="header_color" style="font-size: 18px; font-weight: bold;">Front-end</h2>
+              </div>
+              <div class="col-md-12">
+                  <div v-for="list in frontEnd" :key="list.name">
+                    <div class="flex justify-between mb-1">
+                      <span style="padding-bottom: 5px;" class="font-medium text-white">{{ list.id }}. {{ list.name }}</span>
+                    </div>
+                  </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <h2 class="header_color" style="font-size: 18px; font-weight: bold;">Back-end</h2>
+              </div>
+              <div class="col-md-12">
+                  <div v-for="list in backEnd" :key="list.name">
+                    <div class="flex justify-between mb-1">
+                      <span style="padding-bottom: 5px;" class="font-medium text-white">{{ list.id }}. {{ list.name }}</span>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <h2 class="header_color" style="font-size: 18px; font-weight: bold;">Project Management and more</h2>
+              </div>
+              <div class="col-md-12">
+                  <div v-for="list in projectManagement" :key="list.name">
+                    <div class="flex justify-between mb-1">
+                      <span style="padding-bottom: 5px;" class="font-medium text-white">{{ list.id }}. {{ list.name }}</span>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="bg-black p-8 rounded-xl shadow-sm animate-fade-in delay-1">
+          <h3 class="text-xl font-bold mb-6 text-center header_color">Professional Skills, Seminars and Certifications</h3>
+          <div class="space-y-6">
+             <div class="row">
+              <div class="col-md-12">
+                <h2 class="header_color" style="font-size: 18px; font-weight: bold;">Professional Skills</h2>
+              </div>
+              <div class="col-md-12 text-white">
+                <p style="text-align: justify;">Time management, Multitask within the job scope, Self-oriented, Can adjust and adapt to work environment, 
+                  Open and can deal with both verbal and non-verbal communications, physically and mentally healthy.</p>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-12">
+                <h2 class="header_color" style="font-size: 18px; font-weight: bold;">Seminars and Certifications</h2>
+              </div>
+              <div class="col-md-12">
+                  <div v-for="list in seminarsCertifications" :key="list.name">
+                    <div class="flex justify-between mb-1">
+                      <span style="padding-bottom: 5px;" class="font-medium text-white">{{ list.id }}. {{ list.name }}</span>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects" class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto bg-black rounded-xl mt-12">
+      <div class="text-center mb-12">
+        <!-- <span class="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-500 text-sm font-medium mb-2">PORTFOLIO</span> -->
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-white">Projects and Development</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        <div v-for="(project, index) in projects" :key="project.id" class="bg-white rounded-xl overflow-hidden shadow-md card-hover animate-fade-in" :class="'delay-' + (index % 3 + 1)">
+          <div class="h-48 overflow-hidden">
+            <img :src="project.image" :alt="project.alt" class="object-cover"  style="width: 100%; max-height: 100%;"/>
+          </div>
+          <div class="p-6">
+            <h3 class="text-xl text-black font-bold mb-2">{{ project.title }}</h3>
+            <p class="text-gray-600 mb-4">{{ project.description }}</p>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span v-for="tag in project.tags" :key="tag" class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">{{ tag }}</span>
+            </div>
+            <div class="flex justify-between">
+              <a v-if="project.demoAvailable" :href="project.demoUrl" target="_blank" class="text-yellow-500 hover:text-blue-700 font-medium">Watch Video</a>
+              <a v-else class="text-black font-medium">No Demo Available.</a>
+              <!-- <a :href="project.docuUrl" target="_blank" class="text-gray-500 hover:text-gray-700 font-medium">Documentation</a> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="text-center mt-10 animate-fade-in delay-3">
+        <!-- <a href="#" class="inline-block px-6 py-3 border border-blue-500 text-blue-500 hover:bg-blue-50 font-medium rounded-lg transition duration-300">View All Projects</a> -->
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-16 px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto bg-black rounded-xl shadow-sm mt-8">
+      <div class="text-center mb-12">
+        <!-- <span class="inline-block py-1 px-3 rounded-full bg-blue-50 text-blue-500 text-sm font-medium mb-2">Contact Me</span> -->
+        <h2 class="text-3xl sm:text-4xl font-bold mb-4 text-white">Get In Touch</h2>
+      </div>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="animate-fade-in delay-2">
+          <h3 class="text-2xl font-bold mb-4 header_color">Contact Information</h3>
+          <p class="text-white mb-6">
+            Hey there, feel free to contact me for consultations, collaborations, project management and other tech related topics.
+          </p>
+          
+          <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-blue-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Contact Number</h4>
+                <p class="text-sm text-white">0976-006-9290 (Globe) | 0999-568-7533 (Smart)</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-green-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.4 0C9.473.028 5.333.344 3.02 2.467 1.302 4.187.696 6.7.633 9.817.57 12.933.488 18.776 6.12 20.36h.003l-.004 2.416s-.037.977.61 1.177c.777.242 1.234-.5 1.98-1.302.407-.44.972-1.084 1.397-1.58 3.85.326 6.812-.416 7.15-.525.776-.252 5.176-.816 5.892-6.657.74-6.02-.36-9.83-2.34-11.546-.596-.55-3.006-2.3-8.375-2.323 0 0-.395-.025-1.037-.017zm.058 1.693c.545-.004.88.017.88.017 4.542.02 6.717 1.388 7.222 1.846 1.675 1.435 2.53 4.868 1.906 9.897v.002c-.604 4.878-4.174 5.184-4.832 5.395-.28.09-2.882.737-6.153.524 0 0-2.436 2.94-3.197 3.704-.12.12-.26.167-.352.144-.13-.033-.166-.188-.165-.414l.02-4.018c-4.762-1.32-4.485-6.292-4.43-8.895.054-2.604.543-4.738 1.996-6.173 1.96-1.773 5.474-2.018 7.11-2.03zm.38 2.602c-.167 0-.303.135-.304.302 0 .167.133.303.3.305 1.624.01 2.946.537 4.028 1.592 1.073 1.046 1.62 2.468 1.633 4.334.002.167.14.3.307.3.166-.002.3-.138.3-.304-.014-1.984-.618-3.596-1.816-4.764-1.19-1.16-2.692-1.753-4.447-1.765zm-3.96.695c-.19-.032-.4.005-.616.117l-.01.002c-.43.247-.816.562-1.146.932-.002.004-.006.004-.008.008-.267.323-.42.638-.46.948-.008.046-.01.093-.007.14 0 .136.022.27.065.4l.013.01c.135.48.473 1.276 1.205 2.604.42.768.903 1.5 1.446 2.186.27.344.56.673.87.984l.132.132c.31.308.64.6.984.87.686.543 1.418 1.027 2.186 1.447 1.328.733 2.126 1.07 2.604 1.206l.01.014c.13.042.265.064.402.063.046.002.092 0 .138-.008.31-.036.627-.19.948-.46.004 0 .003-.002.008-.005.37-.33.683-.72.93-1.148l.003-.01c.225-.432.15-.842-.18-1.12-.004 0-.698-.58-1.037-.83-.36-.255-.73-.492-1.113-.71-.51-.285-1.032-.106-1.248.174l-.447.564c-.23.283-.657.246-.657.246-3.12-.796-3.955-3.955-3.955-3.955s-.037-.426.248-.656l.563-.448c.277-.215.456-.737.17-1.248-.217-.383-.454-.756-.71-1.115-.25-.34-.826-1.033-.83-1.035-.137-.165-.31-.265-.502-.297zm4.49.88c-.158.002-.29.124-.3.282-.01.167.115.312.282.324 1.16.085 2.017.466 2.645 1.15.63.688.93 1.524.906 2.57-.002.168.13.306.3.31.166.003.305-.13.31-.297.025-1.175-.334-2.193-1.067-2.994-.74-.81-1.777-1.253-3.05-1.346h-.024zm.463 1.63c-.16.002-.29.127-.3.287-.008.167.12.31.288.32.523.028.875.175 1.113.422.24.245.388.62.416 1.164.01.167.15.295.318.287.167-.008.295-.15.287-.317-.03-.644-.215-1.178-.58-1.557-.367-.378-.893-.574-1.52-.607h-.018z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Viber</h4>
+                <p class="text-sm text-white">0976-006-9290</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-purple-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Email</h4>
+                <p class="text-sm text-white">leerobinroxas8@gmail.com</p>
+              </div>
+            </div>
+            
+            <div class="flex items-center">
+              <div class="mr-3 p-2 bg-yellow-50 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.352 14.585l-4.509 4.614.72-4.062L3.428 7.57 0 7.753 7.58 0v2.953l7.214 6.646 4.513-1.105-4.689 4.982L24 24l-10.648-9.415z" />
+                </svg>
+              </div>
+              <div>
+                <h4 class="font-medium header_color">Address</h4>
+                <p class="text-sm text-white">Santo Tomas, Batangas, Philippines.</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- <a href="#contact" class="inline-block px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition duration-300 shadow-md">Contact Me</a> -->
+        </div>
+        <div class="animate-fade-in delay-1">
+          <img src="https://res.cloudinary.com/dyuan83wz/image/upload/eat_sleep_code_repeat_zewkub.jpg" alt="QR CODE" class="rounded-xl shadow-md w-full" style="max-height: 250px;" />
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Right Section -->
+  <div class="right-section">
+    <section id="">
+        <div class="row">
+            <div class="col-4" v-for="(logo, index) in logos" :key="index">
+                <center><img
+                :src="logo"
+                alt="logo"
+                class="h-16 w-auto object-contain"
+                /></center>
+            </div>
+        </div>
+    </section>
+    <br><br>
+    <section>
+        <p>Let's work together and make everything possible!</p>
+    </section>
+  </div>
+
+    <!-- Floating Action Button -->
+    <div id="fabContainer" class="d-flex d-md-none flex-column align-items-end position-fixed bottom-0 end-0 p-3">
+    <a
+        v-for="navItem in navItems"
+        :key="navItem.label"
+        class="btn btn-info rounded-circle mb-2 fab-child d-none"
+        :href="'#' + navItem.target"
+        style="width: 60px; height: 60px; padding-top: 15px;"
+        @click.prevent="smoothScroll(navItem.target)"
+    >
+        <span>{{ navItem.icon }}</span>
+    </a>
+
+    <button id="mainFab" class="btn btn-primary rounded-circle" style="width: 60px; height: 60px;">
+        <i id="fabIcon" class="fas fa-plus"></i>
+    </button>
+    </div>
+</div>
+
+<script>
+const { createApp, ref, onMounted } = Vue;
+
+createApp({
+  setup() {
+    const skills = ref([
+      { name: 'Vue.js', icon: '⚙️' },
+      { name: 'JavaScript', icon: '📜' },
+      { name: 'HTML/CSS', icon: '🖥️' },
+      { name: 'Node.js', icon: '⬢' },
+      { name: 'REST APIs', icon: '🔗' },
+      { name: 'Git', icon: '🐙' }
+    ]);
+
+    const education = ref([
+      { degree: 'M.S. Computer Science', institution: 'Stanford University', year: '2015 - 2017' }
+    ]);
+
+    const experience = ref([
+      { position: 'Senior Frontend Developer', company: 'TechCorp', year: '2019 - Present', description: 'Leading Vue projects.' }
+    ]);
+
+    const socialLinks = ref([
+      { name: 'GitHub', url: 'https://github.com', icon: '🐱' },
+      { name: 'LinkedIn', url: 'https://linkedin.com', icon: '💼' }
+    ]);
+
+    const works = ref([
+          {
+            id: 1,
+            title: 'Diwa Learning Systems Inc.',
+            location: 'PDCP Centre, V.A. Rufino Cor. Salcedo Village, Makati City, Philippines.',
+            job: 'JUNIOR DEVELOPER',
+            date: 'July 24, 2023 - June 30, 2025.',
+            description: 'A Full-stack Web Developer (Laravel + VueJS) handling client-based projects. Making reports, analyzation, testing and solutions for the project objectives based on the client specifications. Daily/Weekly scrum, retrospective and sprint planning/meetings.',
+            tags: ['Laravel', 'VueJS', 'NodeJS'],
+            image: 'https://res.cloudinary.com/dyuan83wz/image/upload/Diwa_Logo_2_ancg2h.jpg',
+            alt: 'Junior Developer',
+            companyLocation: 'https://maps.app.goo.gl/sHxWyax1ef6nK7Dw7',
+            companyUrl: 'https://www.diwa.ph/'
+          },
+          {
+            id: 2,
+            title: 'Diwa Learning Systems Inc.',
+            location: 'PDCP Centre, V.A. Rufino Cor. Salcedo Village, Makati City, Philippines.',
+            job: 'WEB DEVELOPER INTERN',
+            date: 'February 13, 2023 - May 30, 2023.',
+            description: 'Trained and well-oriented on how to handle and develop web projects. Trained on how to create reports, how to deal with project concerns or issues, how to make solutions effectively and on how to communicate with other work mates. Handled one client-based project during the internship.',
+            tags: ['PHP', 'Laravel', 'Javascript'],
+            image: 'https://res.cloudinary.com/dyuan83wz/image/upload/Diwa_Logo_2_ancg2h.jpg',
+            alt: 'Junior Developer',
+            companyLocation: 'https://maps.app.goo.gl/sHxWyax1ef6nK7Dw7',
+            companyUrl: 'https://www.diwa.ph/'
+          },
+    ]);
+
+    const frontEnd = ref([
+        { id: 1, name: 'HTML, CSS, TailwindCSS, Bootstrap, Other CDNs.' },
+        { id: 2, name: 'Javascript, VueJS and other Libraries.' },
+    ]);
+
+    const backEnd = ref([
+        { id: 1, name: 'PHP, Laravel, Javascript, and NodeJS.' },
+        { id: 2, name: 'APIs, SQL, and DynamoDB.' },
+    ]);
+
+    const projectManagement = ref([
+        { id: 1, name: 'Git/Github (Version Control).' },
+        { id: 2, name: 'AWS (CodeCommit, EC2, S3, and CodeDeploy).' },
+        { id: 3, name: 'Docker (Project Virtual Container).' },
+        { id: 4, name: 'Jira (Ticket Management System).' },
+        { id: 5, name: 'Microsoft applications (Word, PPT, Excel), XAMPP, Laragon, Insomnia, Postman, VS Code, Sublime Merge, MySQL Workbench, PHPMyAdmin, Photoshop and Canva.' },
+    ]);
+
+    const seminarsCertifications = ref([
+        { id: 1, name: 'AWS (Cloud Practitioner Essentials and Technical Essentials) Training/Seminar with certifications.' },
+        { id: 2, name: 'AWS AI Day 2025.' },
+        { id: 3, name: 'Santo Tomas Scholar 2019 - 2023.' },
+        { id: 4, name: "Dean's Lister and President's Lister 2020 - 2023."},
+        { id: 5, name: 'FAITH Psychology Society - Mental Health Awareness Week Celebration 2023.'},
+        { id: 6, name: 'iSite 2020 and 2022.' },
+        { id: 7, name: 'Role Model of the School Year 2017.' },
+    ]);
+
+    const projects = ref([
+          {
+            id: 1,
+            title: 'Accessories Reservation System',
+            description: 'A Basic reservation system that allows the users to make an appointment with the client to manage transaction and marketing.',
+            tags: ['PHP', 'Javascript', 'MySQL'],
+            image: 'https://res.cloudinary.com/dyuan83wz/image/upload/Image_not_available_hlepma.png',
+            alt: 'Accessories Reservation System',
+            demoUrl: '#',
+            docuUrl: '#',
+            demoAvailable: false,
+          },
+          {
+            id: 2,
+            title: 'Recruitment Monitoring System integrated with SMS API and Analytical Reports',
+            description: 'A user tracking system which allows to manage user enrollment status. This system also integrates SMS API and data visualization and analytics.',
+            tags: ['Laravel', 'Javascript', 'MySQL'],
+            image: 'https://res.cloudinary.com/dyuan83wz/image/upload/CCITRACK_LOGO_LANDSCAPE_vbwnku.png',
+            alt: 'Recruitment Monitoring System integrated with SMS API and Analytical Reports',
+            demoUrl: 'https://res.cloudinary.com/dyuan83wz/video/upload/v1751949562/CCITrack_Final_EP_Full_HD_1080p_vqbkds.mp4',
+            docuUrl: '#',
+            demoAvailable: true,
+          },
+          {
+            id: 3,
+            title: 'Diwa Dashboard SMS (School Management System).',
+            description: 'A school management system that allows the user to manage the data of students in terms of their enrollment statuses, finances and other transactions.',
+            tags: ['PHP', 'Javascript', 'MySQL'],
+            image: 'https://res.cloudinary.com/dyuan83wz/image/upload/DIWA_DASHBOARD_m1xsk5.png',
+            alt: 'Diwa Dashboard SMS (School Management System).',
+            demoUrl: '#',
+            docuUrl: '#',
+            demoAvailable: false,
+          },
+          {
+            id: 4,
+            title: 'Diwa Checkbox LMS (Gamified Assessment Portal System).',
+            description: 'A learning management system which goal is to manage and monitor the learning of students. It have features including creation of tests and answering examinations for mastery, managing reports and data visualization.',
+            tags: ['Laravel', 'TailwindCSS', 'VueJS', 'Javascript', 'DynamoDB', 'MySQL', 'Redis'],
+            image: 'https://res.cloudinary.com/dyuan83wz/image/upload/DIWA_CHECKBOX_v1xkpz.png',
+            alt: 'Diwa Checkbox LMS (Gamified Assessment Portal System).',
+            demoUrl: '#',
+            docuUrl: '#',
+            demoAvailable: false,
+          },
+    ]);
+
+    const navItems = ref([
+      { label: 'About Me', target: 'about', icon: '👤' },
+      { label: 'Work', target: 'works', icon: '👤' },
+      { label: 'Skills', target: 'skills', icon: '⚙️' },
+      { label: 'Projects', target: 'projects', icon: '💻' },
+      { label: 'Contact', target: 'contact', icon: '💻' }
+    ]);
+
+    const logos = ref([
+        'https://cdn.simpleicons.org/github/000000',
+        'https://cdn.simpleicons.org/git/cc781f',
+        'https://cdn.simpleicons.org/jira/3878d1',
+        'https://cdn.simpleicons.org/postman/cc781f',
+        'https://cdn.simpleicons.org/sublimetext/e0aa22',
+        'https://cdn.simpleicons.org/mysql/000000',
+        'https://cdn.simpleicons.org/laragon/489cab',
+        'https://cdn.simpleicons.org/canva/2e9db0',
+        'https://cdn.simpleicons.org/node.js/2a6933',
+        'https://cdn.simpleicons.org/laravel/b03f2e',  
+        'https://cdn.simpleicons.org/php/777BB4',  
+        'https://cdn.simpleicons.org/vue.js/2a6933',  
+        'https://cdn.simpleicons.org/docker/489cab',
+        'images/AWS_Logo.png',
+        'https://cdn.simpleicons.org/tailwindcss/34c9eb',
+    ]);
+
+    const smoothScroll = (id) => {
+      const element = document.getElementById(id);
+      if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    onMounted(() => {
+      const mainFab = document.getElementById('mainFab');
+      const fabIcon = document.getElementById('fabIcon');
+      const fabChildren = document.querySelectorAll('#fabContainer .fab-child');
+
+      let isOpen = false;
+
+      const toggleFab = () => {
+        isOpen = !isOpen;
+        fabChildren.forEach(btn => btn.classList.toggle('d-none', !isOpen));
+        fabIcon.classList.toggle('fa-plus', !isOpen);
+        fabIcon.classList.toggle('fa-times', isOpen);
+      };
+
+      mainFab.addEventListener('click', toggleFab);
+
+      fabChildren.forEach(btn => {
+        btn.addEventListener('click', () => {
+          toggleFab();
+        });
+      });
+    });
+
+    return { skills, projects, education, experience, socialLinks, navItems, works, frontEnd, backEnd, seminarsCertifications, projectManagement, logos, smoothScroll };
+  }
+}).mount('#app');
+</script>
+</body>
+</html>
